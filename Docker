@@ -39,4 +39,4 @@ WORKDIR /dash/src
 #open service port
 EXPOSE 9998 9999
 
-CMD sh ../initiate.sh
+CMD sh ../scriptrpc.sh
