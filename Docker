@@ -1,0 +1,42 @@
+FROM ubuntu:16.04
+
+COPY . /dash
+
+WORKDIR /dash/
+
+RUN chmod +x scriptrpc.sh
+
+#shared libraries and dependencies
+RUN apt-get update
+RUN apt-get install -y build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils -y
+RUN apt-get install libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev -y
+RUN apt-get install libboost-all-dev -y
+
+#BerkleyDB for wallet support
+RUN apt-get install software-properties-common -y 
+RUN echo | add-apt-repository ppa:bitcoin/bitcoin
+RUN apt-get update
+RUN apt-get install libdb4.8-dev libdb4.8++-dev -y
+
+#upnp
+RUN apt-get install -y libminiupnpc-dev -y
+
+#ZMQ
+RUN apt-get install -y libzmq3-dev -y
+
+# QT
+RUN apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler -y
+RUN apt-get install libqt4-dev libprotobuf-dev protobuf-compiler -y
+
+#build dash source
+RUN ./autogen.sh
+RUN ./configure.sh
+RUN make
+RUN make install
+
+WORKDIR /dash/src
+
+#open service port
+EXPOSE 9998 9999
+
+CMD sh ../initiate.sh
